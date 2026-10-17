@@ -3,22 +3,28 @@
  * Quick edits:
  *   1. Change UNLOCK_AT to the real date/time (ISO 8601 with +05:30 for IST).
  *   2. Add assets/audio/birthday-song.mp3.
- *   3. Add your photos as assets/photos/memory-01.jpg through memory-12.jpg.
+ *   3. Add your photos as assets/photos/memory-01.jpg through memory-16.jpg.
  *   4. Replace LETTER_TEXT and LETTER_SIGNOFF with your own words.
  */
 'use strict';
 
 const CONFIG = {
-  // Demo deadline requested: 12 October 2026, 11:30 PM India Standard Time.
+  // Demo deadline requested: 12 October 2026, 3:00 PM India Standard Time.
   // Format: YYYY-MM-DDTHH:mm:ss+05:30 (do not remove the timezone offset).
-  UNLOCK_AT: '2026-10-12T11:30:00+05:30',
+  UNLOCK_AT: '2026-10-12T15:00:00+05:30',
   SONG_PATH: 'assets/audio/birthday-song.mp3',
   PHOTO_PATH: 'assets/photos/memory-',
   PHOTO_EXTENSION: '.jpg',
-  PHOTO_COUNT: 12,
-  PHOTO_REVEAL_STAGGER_MS: 310,
-  PHOTO_REVEAL_DURATION_MS: 900,
-  LETTER_TYPING_SPEED_MS: 28,
+  PHOTO_COUNT: 16,
+  // Slow, cinematic entrance: each photo arrives one after another.
+  PHOTO_REVEAL_STAGGER_MS: 520,
+  PHOTO_REVEAL_DURATION_MS: 1200,
+  // Once every photo has fully arrived, keep the gallery on screen for this long.
+  // Automatically advance to the envelope five seconds after every photo has finished appearing.
+  MEMORY_HOLD_AFTER_REVEAL_MS: 5000,
+  // About 20 characters/second, with extra pauses after punctuation and paragraph breaks.
+  LETTER_TYPING_SPEED_MS: 50,
+  // Wait five seconds after the final letter character and sign-off are visible.
   FINAL_SCENE_DELAY_MS: 5000,
 };
 
@@ -48,6 +54,8 @@ let toastTimer = null;
 let countdownTimer = null;
 let cakeAutoAdvanceTimer = null;
 let memoriesAutoAdvanceTimer = null;
+let memoriesReadyTimer = null;
+let memoryReady = false;
 let letterTimer = null;
 let finaleTimer = null;
 let audioStarted = false;
@@ -88,6 +96,12 @@ function updateCountdown() {
 
 function goToScene(name) {
   if (!scenes[name] || currentScene === name) return;
+  if (currentScene === 'memories' && name !== 'memories') {
+    clearTimeout(memoriesReadyTimer);
+    clearTimeout(memoriesAutoAdvanceTimer);
+    memoryReady = false;
+    scenes.memories.classList.remove('is-ready');
+  }
   const previous = scenes[currentScene];
   const next = scenes[name];
   if (previous) {
@@ -211,32 +225,66 @@ function cutCake() {
   $('#cakeInstruction').hidden = true;
   $('#cakeWish').classList.add('is-visible');
   burstConfetti(95);
-  cakeAutoAdvanceTimer = setTimeout(() => goToScene('memories'), 7800);
+  cakeAutoAdvanceTimer = setTimeout(() => goToScene('memories'), 3000);
 }
 
 const photoPositionsWide = [
-  { x: 6, y: 23, r: -10 }, { x: 24, y: 54, r: 7 }, { x: 43, y: 22, r: -5 },
-  { x: 66, y: 26, r: 8 }, { x: 82, y: 55, r: -8 }, { x: 8, y: 62, r: 6 },
-  { x: 29, y: 28, r: 9 }, { x: 48, y: 58, r: -8 }, { x: 69, y: 57, r: 5 },
-  { x: 87, y: 23, r: -5 }, { x: 36, y: 64, r: 6 }, { x: 57, y: 20, r: -7 },
+  // Two loose, staggered rows on wide screens. Overlap is limited to frame edges.
+  // Higher z-values keep the upper-row captions readable when frames meet.
+  { x: 2,  y: 29, r: -7, z: 20 }, { x: 14, y: 31, r: 5,  z: 20 },
+  { x: 26, y: 30, r: -4, z: 20 }, { x: 38, y: 32, r: 6,  z: 20 },
+  { x: 50, y: 29, r: -5, z: 20 }, { x: 62, y: 31, r: 5,  z: 20 },
+  { x: 74, y: 30, r: -3, z: 20 }, { x: 86, y: 29, r: 7,  z: 20 },
+  { x: 4,  y: 59, r: 5,  z: 10 }, { x: 16, y: 61, r: -6, z: 10 },
+  { x: 28, y: 60, r: 7,  z: 10 }, { x: 40, y: 62, r: -4, z: 10 },
+  { x: 52, y: 59, r: 6,  z: 10 }, { x: 64, y: 61, r: -7, z: 10 },
+  { x: 76, y: 60, r: 4,  z: 10 }, { x: 88, y: 59, r: -5, z: 10 },
 ];
 const photoPositionsNarrow = [
-  { x: 3, y: 24, r: -9 }, { x: 61, y: 25, r: 7 }, { x: 26, y: 36, r: -5 },
-  { x: 59, y: 48, r: 8 }, { x: 5, y: 53, r: -7 }, { x: 34, y: 62, r: 6 },
-  { x: 54, y: 68, r: -5 }, { x: 15, y: 68, r: 7 }, { x: 63, y: 36, r: -8 },
-  { x: 7, y: 37, r: 5 }, { x: 38, y: 24, r: -6 }, { x: 35, y: 49, r: 7 },
+  // Four staggered rows keep all sixteen photos individually visible on phones.
+  { x: 3,  y: 23, r: -7, z: 40 }, { x: 26, y: 25, r: 5,  z: 40 },
+  { x: 49, y: 22, r: -4, z: 40 }, { x: 72, y: 24, r: 6,  z: 40 },
+  { x: 5,  y: 40, r: 6,  z: 30 }, { x: 28, y: 42, r: -6, z: 30 },
+  { x: 51, y: 39, r: 7,  z: 30 }, { x: 74, y: 41, r: -5, z: 30 },
+  { x: 2,  y: 57, r: -5, z: 20 }, { x: 25, y: 59, r: 7,  z: 20 },
+  { x: 48, y: 56, r: -7, z: 20 }, { x: 71, y: 58, r: 4,  z: 20 },
+  { x: 4,  y: 74, r: 5,  z: 10 }, { x: 27, y: 76, r: -7, z: 10 },
+  { x: 50, y: 73, r: 6,  z: 10 }, { x: 73, y: 75, r: -4, z: 10 },
 ];
-const photoCaptions = ['a little happiness', 'one for the heart', 'this kind of day', 'my favourite people', 'a moment to keep', 'you, being you', 'the good old days', 'a lovely memory', 'the softest smiles', 'wish we could pause time', 'our little story', 'always worth remembering'];
+const photoPositionsNarrowShort = [
+  // Same phone collage, nudged down with compact cards for short portrait screens.
+  { x: 3,  y: 28, r: -7, z: 40 }, { x: 26, y: 30, r: 5,  z: 40 },
+  { x: 49, y: 27, r: -4, z: 40 }, { x: 72, y: 29, r: 6,  z: 40 },
+  { x: 5,  y: 44, r: 6,  z: 30 }, { x: 28, y: 46, r: -6, z: 30 },
+  { x: 51, y: 43, r: 7,  z: 30 }, { x: 74, y: 45, r: -5, z: 30 },
+  { x: 2,  y: 60, r: -5, z: 20 }, { x: 25, y: 62, r: 7,  z: 20 },
+  { x: 48, y: 59, r: -7, z: 20 }, { x: 71, y: 61, r: 4,  z: 20 },
+  { x: 4,  y: 76, r: 5,  z: 10 }, { x: 27, y: 78, r: -7, z: 10 },
+  { x: 50, y: 75, r: 6,  z: 10 }, { x: 73, y: 77, r: -4, z: 10 },
+];
+const photoCaptions = [
+  'a little happiness', 'one for the heart', 'this kind of day', 'my favourite people',
+  'a moment to keep', 'you, being you', 'the good old days', 'a lovely memory',
+  'the softest smiles', 'wish we could pause time', 'our little story', 'always worth remembering',
+  'another little treasure', 'a day to remember', 'made of little things', 'kept close to my heart',
+];
+
+const reducedMemoryMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const photoRevealStagger = reducedMemoryMotion ? 0 : CONFIG.PHOTO_REVEAL_STAGGER_MS;
+const photoRevealDuration = reducedMemoryMotion ? 50 : CONFIG.PHOTO_REVEAL_DURATION_MS;
 
 function createMemoryCard(index, position) {
   const card = document.createElement('div');
   card.className = 'memory-photo';
   card.style.setProperty('--x', `${position.x}%`);
-  // Keep the first row below the heading so the memory title remains readable on phones and laptops.
-  card.style.setProperty('--y', `${Math.max(position.y, 29)}%`);
-  card.style.setProperty('--rot', `${position.r + (Math.random() * 3 - 1.5)}deg`);
-  card.style.setProperty('--delay', `${index * CONFIG.PHOTO_REVEAL_STAGGER_MS}ms`);
-  card.style.zIndex = String(3 + (index % 5));
+  // Keep every card below the heading, as in the earlier scrapbook layout.
+  card.style.setProperty('--y', `${position.y}%`);
+  const finalRotation = position.r + (Math.random() * 3 - 1.5);
+  card.style.setProperty('--rot', `${finalRotation}deg`);
+  card.style.setProperty('--start-rot', `${finalRotation + (Math.random() * 22 - 11)}deg`);
+  card.style.setProperty('--delay', `${index * photoRevealStagger}ms`);
+  card.style.setProperty('--reveal-duration', `${photoRevealDuration}ms`);
+  card.style.zIndex = String(position.z ?? (3 + (index % 5)));
   card.setAttribute('aria-label', `Memory ${index + 1}`);
   const image = document.createElement('img');
   const fileNumber = String(index + 1).padStart(2, '0');
@@ -268,9 +316,12 @@ function createMemoryCard(index, position) {
 function startMemorySequence() {
   if (photoSequenceStarted) return;
   photoSequenceStarted = true;
+  memoryReady = false;
+  scenes.memories.classList.remove('is-ready');
   const canvas = $('#memoryCanvas');
   const isNarrow = window.matchMedia('(max-width: 760px)').matches;
-  const positions = [...(isNarrow ? photoPositionsNarrow : photoPositionsWide)];
+  const isShort = window.matchMedia('(max-height: 620px)').matches;
+  const positions = [...(isNarrow ? (isShort ? photoPositionsNarrowShort : photoPositionsNarrow) : photoPositionsWide)];
   // Shuffle frame destinations so every visit feels a little like memories drifting into place.
   for (let i = positions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -282,9 +333,25 @@ function startMemorySequence() {
     requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('is-visible')));
   }
   burstConfetti(28);
-  const allPhotosPoppedAt = (CONFIG.PHOTO_COUNT - 1) * CONFIG.PHOTO_REVEAL_STAGGER_MS + CONFIG.PHOTO_REVEAL_DURATION_MS;
-  memoriesAutoAdvanceTimer = setTimeout(() => goToScene('envelope'), allPhotosPoppedAt + 3000);
+
+  // Start the hold timer only after the final card's entrance transition has finished.
+  const allPhotosPoppedAt = (CONFIG.PHOTO_COUNT - 1) * photoRevealStagger + photoRevealDuration;
+  memoriesReadyTimer = setTimeout(() => {
+    if (currentScene !== 'memories') return;
+    memoryReady = true;
+    scenes.memories.classList.add('is-ready');
+    memoriesAutoAdvanceTimer = setTimeout(() => advanceFromMemories(), CONFIG.MEMORY_HOLD_AFTER_REVEAL_MS);
+  }, allPhotosPoppedAt);
 }
+
+function advanceFromMemories() {
+  if (currentScene !== 'memories' || !memoryReady) return;
+  clearTimeout(memoriesAutoAdvanceTimer);
+  clearTimeout(memoriesReadyTimer);
+  memoryReady = false;
+  goToScene('envelope');
+}
+
 
 function openEnvelope() {
   if ($('#letterEnvelope').classList.contains('is-opening')) return;
@@ -308,16 +375,27 @@ function startLetterTyping() {
   const chars = Array.from(LETTER_TEXT);
   const typeNext = () => {
     if (currentScene !== 'letter') return;
-    const batch = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 10 : 2;
-    for (let n = 0; n < batch && index < chars.length; n++, index++) output.textContent += chars[index];
+
+    // Reveal one character at a time so the letter is easy to follow on phones and laptops.
     if (index < chars.length) {
-      letterTimer = setTimeout(typeNext, CONFIG.LETTER_TYPING_SPEED_MS);
-    } else {
-      cursor.classList.add('is-hidden');
-      signoff.textContent = LETTER_SIGNOFF + ' ♡';
-      signoff.classList.add('is-visible');
-      finaleTimer = setTimeout(() => goToScene('finale'), CONFIG.FINAL_SCENE_DELAY_MS);
+      const char = chars[index++];
+      output.textContent += char;
+
+      // Natural pauses give the reader time to follow sentences and paragraph breaks.
+      let nextDelay = CONFIG.LETTER_TYPING_SPEED_MS;
+      if (char === '\n') nextDelay += 260;
+      else if (/[.!?]/u.test(char)) nextDelay += 220;
+      else if (/[,;:]/u.test(char)) nextDelay += 110;
+
+      letterTimer = setTimeout(typeNext, nextDelay);
+      return;
     }
+
+    // The five-second finale timer starts only once the entire letter has been written.
+    cursor.classList.add('is-hidden');
+    signoff.textContent = LETTER_SIGNOFF + ' ♡';
+    signoff.classList.add('is-visible');
+    finaleTimer = setTimeout(() => goToScene('finale'), CONFIG.FINAL_SCENE_DELAY_MS);
   };
   typeNext();
 }
@@ -343,10 +421,13 @@ function addFloatingHearts() {
 
 function replayExperience() {
   clearTimeout(cakeAutoAdvanceTimer);
+  clearTimeout(memoriesReadyTimer);
   clearTimeout(memoriesAutoAdvanceTimer);
   clearTimeout(letterTimer);
   clearTimeout(finaleTimer);
   photoSequenceStarted = false;
+  memoryReady = false;
+  scenes.memories.classList.remove('is-ready');
   letterStarted = false;
   $('#memoryCanvas').replaceChildren();
   $('#letterHearts').replaceChildren();
@@ -438,7 +519,6 @@ $('#continueSilentButton').addEventListener('click', () => {
 $('#lightCandlesButton').addEventListener('click', lightCandles);
 $('#cutCakeButton').addEventListener('click', cutCake);
 $('#continueMemoriesButton').addEventListener('click', () => { clearTimeout(cakeAutoAdvanceTimer); goToScene('memories'); });
-$('#skipMemoriesButton').addEventListener('click', () => { clearTimeout(memoriesAutoAdvanceTimer); goToScene('envelope'); });
 $('#openLetterButton').addEventListener('click', openEnvelope);
 $('#replayButton').addEventListener('click', replayExperience);
 

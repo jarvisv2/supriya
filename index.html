@@ -20,7 +20,6 @@
   <div id="confettiLayer" aria-hidden="true"></div>
 
   <header class="site-topbar" aria-label="Birthday experience controls">
-    <a class="monogram" href="#" aria-label="For Supriya" tabindex="-1"><span>S</span><i>✦</i></a>
     <div class="topbar-right">
       <span class="topbar-note"><span class="live-dot"></span> A little universe for you</span>
       <button class="sound-button" id="soundButton" type="button" aria-label="Enable birthday music"><span class="sound-icon">♫</span><span id="soundLabel">Sound on</span></button>
@@ -97,11 +96,11 @@
     </section>
 
     <!-- Scene 3: Memory photos -->
-    <section class="scene memories-scene" id="memoriesScene" aria-labelledby="memoriesHeading" aria-hidden="true">
+    <section class="scene memories-scene" id="memoriesScene" aria-labelledby="memoriesHeading" aria-hidden="true" tabindex="0">
       <div class="memory-wash" aria-hidden="true"></div>
       <div class="memory-heading"><p class="eyebrow">LITTLE MOMENTS, BIG FEELINGS</p><h2 id="memoriesHeading">A few pieces of <em>our story.</em></h2><p>Every little memory has a place in my heart.</p></div>
       <div class="memory-canvas" id="memoryCanvas" aria-label="A floating collection of memory photos"></div>
-      <div class="memory-footer"><span>COLLECTED WITH LOVE ✦</span><button type="button" class="text-link" id="skipMemoriesButton">One more surprise <span>↗</span></button></div>
+      <div class="memory-footer"><span>COLLECTED WITH LOVE ✦</span></div>
       <div class="scene-counter">03 <i>/</i> 05</div>
     </section>
 
@@ -164,5 +163,4 @@
 
   <audio id="backgroundMusic" src="assets/audio/birthday-song.mp3" preload="auto" loop playsinline></audio>
 </body>
-</html> 
-  
+</html>

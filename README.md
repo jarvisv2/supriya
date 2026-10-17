@@ -21,7 +21,7 @@ The site uses one persistent HTML audio element for the entire journey; scene ch
 
 ## Add your photos
 
-Put up to 12 photos in `assets/photos/` using these exact names:
+Put your 16 photos in `assets/photos/` using these exact names:
 
 ```text
 memory-01.jpg
@@ -36,9 +36,31 @@ memory-09.jpg
 memory-10.jpg
 memory-11.jpg
 memory-12.jpg
+memory-13.jpg
+memory-14.jpg
+memory-15.jpg
+memory-16.jpg
 ```
 
 Use `.jpg` filenames as written, or update `PHOTO_EXTENSION` in `script.js` if your files use a different extension. Photos should ideally be portrait or square; the gallery crops images to fit its floating polaroid frames. Before you upload the photos, illustrated placeholder cards appear instead of broken image icons.
+
+## Cake cutting timing
+
+After the cake-cutting animation and birthday wish appear, the site automatically moves to the memory gallery after **3 seconds**.
+
+## Memory gallery timing
+
+The photos arrive one by one with a slower blur-to-focus, lift, and slight rotation animation. After the final card finishes entering, the gallery waits **5 seconds** and then automatically moves to the envelope scene. There is no tap prompt or manual skip control; the transition is automatic.
+
+To adjust the feel, edit these values near the top of `script.js`:
+
+```js
+PHOTO_REVEAL_STAGGER_MS: 520,       // gap between each photo's entrance
+PHOTO_REVEAL_DURATION_MS: 1200,    // each photo's entrance animation
+MEMORY_HOLD_AFTER_REVEAL_MS: 5000,  // wait after the last photo finishes
+```
+
+For example, `MEMORY_HOLD_AFTER_REVEAL_MS: 8000` waits eight seconds after all photos have appeared.
 
 ## Personalize the letter
 
@@ -92,4 +114,10 @@ supriya-birthday-site/
 
 ## Responsive layout
 
-The layout adapts automatically to the available screen width and height using responsive CSS breakpoints and viewport sizing. Smaller phones use a compact cake and photo layout; short landscape screens use a more compact memory heading; larger phones and laptops use the expanded composition. No device-specific setup is needed.
+The layout adapts automatically to the available screen width and height using responsive CSS breakpoints and viewport sizing. The memory wall accommodates all 16 photos in a loose, overlapping Polaroid scrapbook arrangement, restoring the earlier scattered styling rather than a rigid grid. Desktop, portrait-phone, and short landscape layouts use separate position maps and responsive card sizing. No device-specific setup is needed.
+
+
+### Letter timing
+- The letter reveals one character at a time at 50 ms per character, with additional pauses after punctuation and paragraph breaks.
+- After the complete letter and sign-off appear, the site waits 5 seconds before showing the final LOVE YOU scene.
+- Adjust `LETTER_TYPING_SPEED_MS` and `FINAL_SCENE_DELAY_MS` near the top of `script.js` if you want to fine-tune the pacing.
