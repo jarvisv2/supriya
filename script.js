@@ -9,9 +9,9 @@
 'use strict';
 
 const CONFIG = {
-  // Demo deadline requested: 18 October 2026, 4:30 PM India Standard Time.
+  // Demo deadline requested: 17 October 2026, 3:30 PM India Standard Time.
   // Format: YYYY-MM-DDTHH:mm:ss+05:30 (do not remove the timezone offset).
-  UNLOCK_AT: '2026-10-18T18:30:00+05:30',
+  UNLOCK_AT: '2026-10-17T15:30:00+05:30',
   SONG_PATH: 'assets/audio/birthday-song.mp3',
   PHOTO_PATH: 'assets/photos/memory-',
   PHOTO_EXTENSION: '.jpg',
