@@ -23,18 +23,18 @@ const CONFIG = {
   // Automatically advance to the envelope five seconds after every photo has finished appearing.
   MEMORY_HOLD_AFTER_REVEAL_MS: 5000,
   // About 20 characters/second, with extra pauses after punctuation and paragraph breaks.
-  LETTER_TYPING_SPEED_MS: 50,
+  LETTER_TYPING_SPEED_MS: 80,
   // Wait five seconds after the final letter character and sign-off are visible.
   FINAL_SCENE_DELAY_MS: 5000,
 };
 
 // A temporary starter message so the whole journey can be previewed before your letter is ready.
 // Replace this text later; line breaks are preserved by the typewriter.
-const LETTER_TEXT = `These are my inner thoughts, things I've wanted to express for a long time. I thought I should tell you everything that's going on inside me, maybe just to feel a little lighter.
+const LETTER_TEXT = `These are my inner thoughts, things I've wanted to express for a long time. I thought i should tell you everything that's going on inside me, maybe just to feel a little lighter.
 
 You know, I have really strong feelings for you. I don't know how it happened or when it became this strong. Even though we're long distance and my feelings one sided, even though we have never had that kind of physical closeness, somehow you have become such a big part of my heart..
 
-Sometimes, when I see you photos in my gallery or social media or even hear the name Supriya anywhere, it brings back so many memories. Its almost like something in the frontal part of my cerebral cortex of brain suddenly brings everything back to the memories of you, our nonsense conversations, all those little moments... they just come back in front of my eyes. I can't control when they return. I can't delete and i don't know how to replace them with something else. no matter how much i try, those memories are still there....
+Sometimes, when i see you photos in my gallery or social media or even hear the name Supriya anywhere, it brings back so many memories. Its almost like something in the frontal part of my cerebral cortex of brain suddenly brings everything back to the memories of you, our nonsense conversations, all those little moments... they just come back in front of my eyes. I can't control when they return. I can't delete and i don't know how to replace them with something else. no matter how much i try, those memories are still there....
 
 I know I'm still unemployed. Sometimes, i think that even after i get a job and become settled in life, I'll go to your parents and ask for your hand. But then i think, what's the point of dreaming about something when i already know you don't have the same feelings for me... there is also the issue of caste on your side, which makes me think even more about whether something like this could ever happen. still, somewhere in my mind, those thoughts remain. All i really want is to see you happy for the rest of my life, even if i'm not the person who gets to be beside you.... 
 
@@ -54,17 +54,17 @@ At the end, there is one thought that sometimes comes to my mind....
 
 If you have even a little feeling for me somewhere in a corner of your heart... something you have never expressed or maybe haven't even realised yourself... then i don't know what to say, if you believe in another birth or another timeline, maybe somewhere else things could happen differently and we could love each other... Maybe things that seem impossible in this life could happen in that one, i know it's just a thought, but somehow it feels nice to imagine it sometimes...
 
-But in this birth, in this timeline, maybe we have to accept things as they are.... maybe we are meant to be just the way we are now and i have to learn to be happy with that.
+But in this birth, in this timeline, maybe i have to accept things as they are.... maybe we are meant to be just the way we are now and i have to learn to be happy with that.
 
 I just want you to be happy, no matter what happens in the future. I don't know what place i will have in your life or whether you will remember our conversations and little moments the way i do.. maybe with time, these feelings will become easier.....
 
 You will always be someone special in my life, someone whose memories can still make me smile even when things didn't turn out the way i hoped....
 
-I always wished i could call you mine... that's why i wanted to name you Sizu. but maybe i'll always be your Nobita, loving his Sizuka from a distance. ♡
+I hope i haven't ruined your birthday by telling you all this... If I have, i'm extremely sorry...
 
 Happy birthday, beautiful. ♡
 
-I hope i haven't ruined your birthday by telling you all this... If I have, i'm extremely sorry...
+I always wished i could call you mine... that's why i wanted to name you Sizu. but maybe i'll always be your Nobita, loving his Sizuka from a distance. ♡
 
 Goodbye, Sizu ❤️💕`;
 const LETTER_SIGNOFF = 'With all my love,';
