@@ -9,7 +9,7 @@
 'use strict';
 
 const CONFIG = {
-  // Demo deadline requested: 18 October 2026, 12:00 PM India Standard Time.
+  // Current test deadline: 18 October 2026, 12:00 PM India Standard Time.
   // Format: YYYY-MM-DDTHH:mm:ss+05:30 (do not remove the timezone offset).
   UNLOCK_AT: '2026-10-18T12:00:00+05:30',
   SONG_PATH: 'assets/audio/birthday-song.mp3',
@@ -30,7 +30,43 @@ const CONFIG = {
 
 // A temporary starter message so the whole journey can be previewed before your letter is ready.
 // Replace this text later; line breaks are preserved by the typewriter.
-const LETTER_TEXT = `On your birthday, I hope you get to see even a little of what makes you so special. You have a way of making ordinary moments feel warmer, and your smile can make a difficult day feel lighter.\n\nI hope this new chapter brings you the kind of happiness that stays, the kind of peace that feels like home, and a thousand little reasons to smile. Never forget how precious you are, how much you deserve, and how beautifully you make this world your own.\n\nToday is all about you, Supriya. Make your wishes boldly, laugh a little louder, and let yourself be celebrated the way you deserve. If this little corner of the internet can make you smile, then it has done exactly what I dreamed it would.\n\nHappy birthday, beautiful. ♡`;
+const LETTER_TEXT = `These are my inner thoughts, things I've wanted to express for a long time. I thought I should tell you everything that's going on inside me, maybe just to feel a little lighter.
+
+You know, I have really strong feelings for you. I don't know how it happened or when it became this strong. Even though we're long distance and my feelings one sided, even though we have never had that kind of physical closeness, somehow you have become such a big part of my heart..
+
+Sometimes, when I see you photos in my gallery or social media or even hear the name Supriya anywhere, it brings back so many memories. Its almost like something in the frontal part of my cerebral cortex of brain suddenly brings everything back to the memories of you, our nonsense conversations, all those little moments... they just come back in front of my eyes. I can't control when they return. I can't delete and i don't know how to replace them with something else. no matter how much i try, those memories are still there....
+
+I know I'm still unemployed. Sometimes, i think that even after i get a job and become settled in life, I'll go to your parents and ask for your hand. But then i think, what's the point of dreaming about something when i already know you don't have the same feelings for me... there is also the issue of caste on your side, which makes me think even more about whether something like this could ever happen. still, somewhere in my mind, those thoughts remain. All i really want is to see you happy for the rest of my life, even if i'm not the person who gets to be beside you.... 
+
+I don't know how to explain what i feel for you. There are so many things in my heart that i want to tell you, but when i try to put them into words, sentences, nothing seems enough. I can feel so much inside me, yet sometimes i can't even explain.....
+
+You always tell me to meet you, but i keep avoiding it, maybe you feel bad why i do that when you are the most valuable person i want to see every time in front of my eyes... the reason is something i have never really been able to explain to you....
+
+When we meet, when you come close to me, when you touch me, hold my hand or show that you care about me, those moments feel special to me. Even the smallest gesture from you can stay in my heart for a long time.... but at the same time my brain knows that for you, it might just be a normal friendly meeting... Sometimes, even a small moment with you becomes something i keep thinking about long after its over....
+
+I don't know whether you have ever noticed this, but there were times when we talked so much that it felt like you couldn't go a day without seeing me or having a conversation with me. Maybe there was a little emotion for me somewhere in a corner of your heart.. or maybe i'm completely wrong, and it was just my perception... Maybe i gave those little things more meaning than they actually had because i wanted to believe there was something more between us....
+
+But those short periods, those few days when we talked so much and felt close, affect me more than you probably realise. When things suddenly change or we stop talking because of blocked, it completely breaks me inside... I tried to move on, but somehow i can't do... that's why i sometimes avoid meeting you... it's not because i dont want to see you... it's because i'm afraid that seeing you again will bring back the same feelings, same hope, and same little spark i have been trying so hard to let go of.. So I keep my distance, even when a part of me wants to be close to you...
+
+Still, you will always have a special place in my memories, in my heart even after years have passed... I think i will remember these moments and honestly when i look back at them, i feel happy too... I'm glad that i got to know you and share those little moments with you... I just dont want to keep creating a new memories that might make it even harder for me to move on someday...
+
+At the end, there is one thought that sometimes comes to my mind....
+
+If you have even a little feeling for me somewhere in a corner of your heart... something you have never expressed or maybe haven't even realised yourself... then i don't know what to say, if you believe in another birth or another timeline, maybe somewhere else things could happen differently and we could love each other... Maybe things that seem impossible in this life could happen in that one, i know it's just a thought, but somehow it feels nice to imagine it sometimes...
+
+But in this birth, in this timeline, maybe we have to accept things as they are.... maybe we are meant to be just the way we are now and i have to learn to be happy with that.
+
+I just want you to be happy, no matter what happens in the future. I don't know what place i will have in your life or whether you will remember our conversations and little moments the way i do.. maybe with time, these feelings will become easier.....
+
+You will always be someone special in my life, someone whose memories can still make me smile even when things didn't turn out the way i hoped....
+
+I always wished i could call you mine... that's why i wanted to name you Sizu. but maybe i'll always be your Nobita, loving his Sizuka from a distance. ♡
+
+Happy birthday, beautiful. ♡
+
+I hope i haven't ruined your birthday by telling you all this... If I have, i'm extremely sorry...
+
+Goodbye, Sizu ❤️💕`;
 const LETTER_SIGNOFF = 'With all my love,';
 
 const $ = (selector, parent = document) => parent.querySelector(selector);
@@ -45,6 +81,10 @@ const scenes = {
   finale: $('#finaleScene'),
 };
 const audio = $('#backgroundMusic');
+const letterPaperElement = $('#letterPaper');
+let userManuallyScrolledLetter = false;
+letterPaperElement.addEventListener('wheel', () => { userManuallyScrolledLetter = true; }, { passive: true });
+letterPaperElement.addEventListener('touchmove', () => { userManuallyScrolledLetter = true; }, { passive: true });
 const soundButton = $('#soundButton');
 const soundLabel = $('#soundLabel');
 const soundCurtain = $('#soundCurtain');
@@ -366,6 +406,8 @@ function startLetterTyping() {
   const output = $('#typedLetter');
   const cursor = $('#typingCursor');
   const signoff = $('#letterSignoff');
+  userManuallyScrolledLetter = false;
+  letterPaperElement.scrollTop = 0;
   let index = 0;
   output.textContent = '';
   signoff.classList.remove('is-visible');
@@ -380,6 +422,8 @@ function startLetterTyping() {
     if (index < chars.length) {
       const char = chars[index++];
       output.textContent += char;
+      // Keep the newest line visible while typing; if she manually scrolls to reread, respect that.
+      if (!userManuallyScrolledLetter) letterPaperElement.scrollTop = letterPaperElement.scrollHeight;
 
       // Natural pauses give the reader time to follow sentences and paragraph breaks.
       let nextDelay = CONFIG.LETTER_TYPING_SPEED_MS;
@@ -393,8 +437,13 @@ function startLetterTyping() {
 
     // The five-second finale timer starts only once the entire letter has been written.
     cursor.classList.add('is-hidden');
-    signoff.textContent = LETTER_SIGNOFF + ' ♡';
-    signoff.classList.add('is-visible');
+    if (LETTER_SIGNOFF.trim()) {
+      signoff.textContent = LETTER_SIGNOFF + ' ♡';
+      signoff.classList.add('is-visible');
+    } else {
+      signoff.textContent = '';
+      signoff.classList.remove('is-visible');
+    }
     finaleTimer = setTimeout(() => goToScene('finale'), CONFIG.FINAL_SCENE_DELAY_MS);
   };
   typeNext();
@@ -443,6 +492,8 @@ function replayExperience() {
   $('#letterEnvelope').classList.remove('is-opening');
   $('#openLetterButton').disabled = false;
   $('#typedLetter').textContent = '';
+  $('#letterPaper').scrollTop = 0;
+  userManuallyScrolledLetter = false;
   $('#typingCursor').classList.remove('is-hidden');
   $('#letterSignoff').classList.remove('is-visible');
   goToScene('cake');
