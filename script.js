@@ -9,9 +9,9 @@
 'use strict';
 
 const CONFIG = {
-  // Current test deadline: 19 October 2026, 4:40 PM India Standard Time.
+  // Current test deadline: 19 October 2026, 4:45 PM India Standard Time.
   // Format: YYYY-MM-DDTHH:mm:ss+05:30 (do not remove the timezone offset).
-  UNLOCK_AT: '2026-10-19T16:40:00+05:30',
+  UNLOCK_AT: '2026-10-19T16:45:00+05:30',
   SONG_PATH: 'assets/audio/birthday-song.mp3',
   PHOTO_PATH: 'assets/photos/memory-',
   PHOTO_EXTENSION: '.jpg',
